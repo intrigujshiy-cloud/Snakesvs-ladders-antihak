@@ -276,7 +276,7 @@
             ph_bg: "URL Fondo del Juego", ph_modal: "URL Fondo Modal", ph_music: "URL Música (MP3)",
             lbl_players: "JUGADORES:", lbl_trail: "ESTELA:", lbl_trail_color: "COLOR ESTELA",
             opt_match: "Igualar", opt_rainbow: "ARCOÍRIS", opt_custom: "Personalizado", opt_none: "Ninguno",
-            lbl_dice: "DADO:", dice_classic: "Clásico", dice_glass: "Vidrio", dice_neon: "Neón", dice_gold: "Oro",
+            lbl_dice: "DADO:", dice_classic: "Clásico", dice_glass: "Vidrio", dice_neon: "Neón", dice_gold: "Or",
             lbl_tokens: "FICHAS:", ph_token: "Ficha", lbl_w: "Ancho:", lbl_h: "Alto:",
             ph_ladder: "URL Escalera", ph_snake: "URL Serpent", btn_load: "CARGAR PREGUNTAS",
             lbl_q: "PREGUNTAS", lbl_a: "RESPUESTAS", lbl_cells: "Celdas:", lbl_ladders: "Escaleras:", lbl_snakes: "Serpientes:",
@@ -578,7 +578,8 @@
         if(bgImg.src&&bgImg.complete)ctx.drawImage(bgImg,0,0,cvs.width,cvs.height); 
         trailParticles.forEach(p=>{ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,7); ctx.fill();}); 
         ctx.globalAlpha=1.0; 
-        state.links.forEach(l=>{ const f=state.points[l.from], t=state.points[l.to]; if(f&&t){ const x1=f.x*cvs.width, y1=f.y*cvs.height, x2=t.x*cvs.width, y2=t.y*cvs.height, dist=Math.hypot(x2-x1,y2-y1), ang=Math.atan2(y2-y1,x2-x1), isL=(y2<y1); let im=isL?ladderImgObj:snakeImgObj, th=isL?state.ladderTh:state.snakeTh; if(im.complete&&im.src){ctx.save(); ctx.translate(x1,y1); ctx.rotate(ang+Math.PI/2); ctx.drawImage(im,-th/2,-dist,th,dist); ctx.restore();} } }); 
+        
+        // --- 1. РИСУЕМ ЦВЕТЫ/ТОЧКИ (СНАЧАЛА, ЧТОБЫ ОНИ БЫЛИ СНИЗУ) ---
         state.points.forEach((p,i)=>{ 
             const px=p.x*cvs.width, py=p.y*cvs.height, s=state.cellSize;
             const hasT=tPos.some(tp=>Math.hypot(tp.x-px,tp.y-py)<15);
@@ -616,6 +617,9 @@
             }
             ctx.restore(); 
         }); 
+
+        // --- 2. РИСУЕМ ЗМЕЙ И ЛЕСТНИЦЫ (ПОТОМ, ЧТОБЫ ОНИ БЫЛИ СВЕРХУ) ---
+        state.links.forEach(l=>{ const f=state.points[l.from], t=state.points[l.to]; if(f&&t){ const x1=f.x*cvs.width, y1=f.y*cvs.height, x2=t.x*cvs.width, y2=t.y*cvs.height, dist=Math.hypot(x2-x1,y2-y1), ang=Math.atan2(y2-y1,x2-x1), isL=(y2<y1); let im=isL?ladderImgObj:snakeImgObj, th=isL?state.ladderTh:state.snakeTh; if(im.complete&&im.src){ctx.save(); ctx.translate(x1,y1); ctx.rotate(ang+Math.PI/2); ctx.drawImage(im,-th/2,-dist,th,dist); ctx.restore();} } }); 
         
         const T = translations[state.lang] || translations.ru;
         ctx.font = `bold 40px ${state.font}`; ctx.fillStyle = state.colors.dots; ctx.textAlign = "center"; 
